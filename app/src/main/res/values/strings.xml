@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TipCalculator</string>
+    <string name="calculate_tip">Calculate Tip</string>
+    <string name="bill_amount">Bill Amount</string>
+    <string name="tip_amount">Tip Amount: %s</string>
+    <string name="how_was_the_service">how was the service\n</string>
+    <string name="round_up_tip">round_up_tip</string>
+</resources>
