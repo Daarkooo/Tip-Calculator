@@ -4,6 +4,7 @@ package com.example.tipcalculator
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.BoringLayout
+import androidx.compose.material3.Icon
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -68,12 +69,13 @@ fun TipCalculatorLayout() {
 
     val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tipPercentage = tipAmountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount, tipPercentage)
+    val tip = calculateTip(amount, tipPercentage, roundUp)
 
 
     Column(
         modifier = Modifier
-            .padding(horizontal = 40.dp),
+            .padding(horizontal = 40.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -84,17 +86,23 @@ fun TipCalculatorLayout() {
                 .align(alignment = Alignment.Start)
         )
         EditNumberField(
+            label = R.string.bill_amount,
+            leadingIcon = R.drawable.money,
             value = amountInput,
             onValueChange = { amountInput = it},
             message = stringResource(R.string.bill_amount),
             imeAction = ImeAction.Next,
             modifier = Modifier
                 .padding(bottom = 32.dp)
-                .fillMaxWidth())
+                .fillMaxWidth()
+        )
+
         EditNumberField(
+            label = R.string.how_was_the_service,
+            leadingIcon = R.drawable.percent,
             value = tipAmountInput,
             onValueChange = {tipAmountInput = it},
-            message = stringResource(R.string.tip_amount),
+            message = stringResource(R.string.tip_percentage),
             imeAction = ImeAction.Done,
             modifier = Modifier
                 .padding(bottom = 32.dp)
@@ -148,6 +156,8 @@ fun RoundTheTipRow(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNumberField(
+    @StringRes label : Int,
+    @DrawableRes leadingIcon : Int,
     value: String,
     onValueChange: (String)->Unit,
     message: String,
@@ -156,6 +166,7 @@ fun EditNumberField(
 ){
    TextField(
        value = value,
+       leadingIcon = { Icon(painter = painterResource(id = leadingIcon),null)},
        onValueChange = onValueChange,
        singleLine = true,
        label = { Text(message)},
@@ -168,11 +179,13 @@ fun EditNumberField(
    )
 }
 
-private fun calculateTip(amount: Double, tipPercent: Double, /*roundUp: Boolean*/): String {
-    val tip = tipPercent / 100 * amount
-//    if (roundUp) {
-//        tip = kotlin.math.ceil(tip)
-//    }
+private fun calculateTip(
+    amount: Double,
+    tipPercent: Double, roundUp: Boolean): String {
+    var tip = tipPercent / 100 * amount
+    if (roundUp) {
+        tip = kotlin.math.ceil(tip)
+    }
     return NumberFormat.getCurrencyInstance().format(tip)
 }
 
