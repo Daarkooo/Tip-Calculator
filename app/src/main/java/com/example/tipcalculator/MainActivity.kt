@@ -60,9 +60,11 @@ class MainActivity : ComponentActivity() {
 fun TipCalculatorLayout() {
 
     var amountInput by remember { mutableStateOf("")}
+    var tipAmountInput by remember { mutableStateOf("") }
 
     val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+    val tipPercentage = tipAmountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount, tipPercentage)
 
     Column(
         modifier = Modifier
@@ -79,9 +81,20 @@ fun TipCalculatorLayout() {
         EditNumberField(
             value = amountInput,
             onValueChange = { amountInput = it},
+            message = stringResource(R.string.bill_amount),
+            imeAction = ImeAction.Next,
             modifier = Modifier
                 .padding(bottom = 32.dp)
                 .fillMaxWidth())
+        EditNumberField(
+            value = tipAmountInput,
+            onValueChange = {tipAmountInput = it},
+            message = stringResource(R.string.tip_amount),
+            imeAction = ImeAction.Done,
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
 
         Text(
             text = stringResource(R.string.tip_amount, tip),
@@ -98,19 +111,25 @@ fun TipCalculatorLayout() {
 fun EditNumberField(
     value: String,
     onValueChange: (String)->Unit,
+    message: String,
+    imeAction: ImeAction,
     modifier: Modifier = Modifier
 ){
    TextField(
        value = value,
        onValueChange = onValueChange,
        singleLine = true,
-       label = { Text(stringResource(R.string.bill_amount))},
-       keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+       label = { Text(message)},
+       keyboardOptions = KeyboardOptions.Default.copy(
+           keyboardType = KeyboardType.Number,
+           imeAction = imeAction
+       ),
+
        modifier=modifier,
    )
 }
 
-private fun calculateTip(amount: Double, tipPercent: Double = 15.0, /*roundUp: Boolean*/): String {
+private fun calculateTip(amount: Double, tipPercent: Double, /*roundUp: Boolean*/): String {
     val tip = tipPercent / 100 * amount
 //    if (roundUp) {
 //        tip = kotlin.math.ceil(tip)
