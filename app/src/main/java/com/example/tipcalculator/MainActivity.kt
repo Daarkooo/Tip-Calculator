@@ -3,6 +3,7 @@ package com.example.tipcalculator
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.BoringLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,6 +40,7 @@ import com.example.tipcalculator.ui.theme.TipCalculatorTheme
 import java.text.NumberFormat
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import kotlin.math.round
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,14 +64,17 @@ fun TipCalculatorLayout() {
     var amountInput by remember { mutableStateOf("")}
     var tipAmountInput by remember { mutableStateOf("") }
 
+    var roundUp by remember { mutableStateOf(false) }
+
     val amount = amountInput.toDoubleOrNull() ?: 0.0
     val tipPercentage = tipAmountInput.toDoubleOrNull() ?: 0.0
     val tip = calculateTip(amount, tipPercentage)
 
+
     Column(
         modifier = Modifier
-            .padding(horizontal = 40.dp)
-        ,horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(horizontal = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
@@ -95,15 +100,49 @@ fun TipCalculatorLayout() {
                 .padding(bottom = 32.dp)
                 .fillMaxWidth()
         )
+        RoundTheTipRow(
+            roundUp = roundUp,
+            onRoundUpChanged = { roundUp = it},
+//            modifier = Modifier.padding(bottom = 32.dp)
 
+        )
         Text(
             text = stringResource(R.string.tip_amount, tip),
             style = MaterialTheme.typography.displaySmall,
             fontWeight = FontWeight.Bold,
+//            modifier = Modifier.padding(top = 32.dp)
         )
         Spacer(modifier = Modifier.height(150.dp))
     }
 }
+
+@Composable
+fun RoundTheTipRow(
+    roundUp : Boolean,
+    onRoundUpChanged: (Boolean) -> Unit,
+    modifier: Modifier= Modifier
+
+){
+    Row(
+        modifier =modifier
+            .fillMaxWidth()
+            .size(48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Text(
+            text = stringResource(R.string.round_up_tip),
+        )
+
+        Switch(
+            checked = roundUp,
+            onCheckedChange = onRoundUpChanged,
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.End)
+        )
+    }
+}
+
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,76 +184,3 @@ fun TipTimeLayoutPreview() {
         TipCalculatorLayout()
     }
 }
-
-//        EditNumberField(
-//            label = R.string.bill_amount,
-//            leadingIcon = R.drawable.money,
-//            keyboardOptions = KeyboardOptions.Default.copy(
-//                keyboardType = KeyboardType.Number,
-//                imeAction = ImeAction.Next
-//            ),
-//            value = amountInput,
-//            onValueChanged = { amountInput = it },
-//            modifier = Modifier.padding(bottom = 32.dp).fillMaxWidth(),
-//        )
-//        EditNumberField(
-//            label = R.string.how_was_the_service,
-//            leadingIcon = R.drawable.percent,
-//            keyboardOptions = KeyboardOptions.Default.copy(
-//                keyboardType = KeyboardType.Number,
-//                imeAction = ImeAction.Done
-//            ),
-//            value = tipInput,
-//            onValueChanged = { tipInput = it },
-//            modifier = Modifier.padding(bottom = 32.dp).fillMaxWidth(),
-//        )
-//        RoundTheTipRow(
-//            roundUp = roundUp,
-//            onRoundUpChanged = { roundUp = it },
-//            modifier = Modifier.padding(bottom = 32.dp)
-//        )
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun EditNumberField(
-//    @StringRes label: Int,
-//    @DrawableRes leadingIcon: Int,
-//    keyboardOptions: KeyboardOptions,
-//    value: String,
-//    onValueChanged: (String) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    TextField(
-//        value = value,
-//        singleLine = true,
-//        leadingIcon = { Icon(painter = painterResource(id = leadingIcon), null) },
-//        modifier = modifier,
-//        onValueChange = onValueChanged,
-//        label = { Text(stringResource(label)) },
-//        keyboardOptions = keyboardOptions
-//    )
-//}
-//
-//@Composable
-//fun RoundTheTipRow(
-//    roundUp: Boolean,
-//    onRoundUpChanged: (Boolean) -> Unit,
-//    modifier: Modifier = Modifier
-//) {
-//    Row(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .size(48.dp),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Text(text = stringResource(R.string.round_up_tip))
-//        Switch(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .wrapContentWidth(Alignment.End),
-//            checked = roundUp,
-//            onCheckedChange = onRoundUpChanged
-//        )
-//    }
-//}
